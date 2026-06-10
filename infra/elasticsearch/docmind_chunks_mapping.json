@@ -1,0 +1,13 @@
+{
+  "mappings": {
+    "properties": {
+      "content": {"type": "text", "analyzer": "english", "fields": {"french": {"type": "text", "analyzer": "french"}, "keyword": {"type": "keyword"}}},
+      "document_id": {"type": "keyword"},
+      "collection_id": {"type": "keyword"},
+      "source_title": {"type": "text"},
+      "page_number": {"type": "integer"},
+      "heading_path": {"type": "text"}
+    }
+  },
+  "settings": {"similarity": {"bm25_custom": {"type": "BM25", "k1": 1.5, "b": 0.75}}}
+}

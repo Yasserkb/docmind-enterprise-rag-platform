@@ -1,0 +1,1 @@
+export function Settings() { return <section><h1>Settings</h1><div className="card"><h3>Runtime mode</h3><p>The default mode uses deterministic local adapters. Production adapters can be added for external LLMs, real embedding models, PostgreSQL persistence, Qdrant indexing and Elasticsearch BM25 indexing.</p></div></section>; }

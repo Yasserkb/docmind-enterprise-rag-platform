@@ -1,0 +1,16 @@
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { Layout } from './components/Layout';
+import { Home } from './pages/Home';
+import { Collections } from './pages/Collections';
+import { Chat } from './pages/Chat';
+import { Agent } from './pages/Agent';
+import { Evaluation } from './pages/Evaluation';
+import { Metrics } from './pages/Metrics';
+import { Settings } from './pages/Settings';
+import './style.css';
+const client=new QueryClient();
+const router=createBrowserRouter([{path:'/',element:<Layout/>,children:[{index:true,element:<Home/>},{path:'collections',element:<Collections/>},{path:'chat',element:<Chat/>},{path:'agent',element:<Agent/>},{path:'evaluation',element:<Evaluation/>},{path:'metrics',element:<Metrics/>},{path:'settings',element:<Settings/>}]}]);
+ReactDOM.createRoot(document.getElementById('root')!).render(<React.StrictMode><QueryClientProvider client={client}><RouterProvider router={router}/></QueryClientProvider></React.StrictMode>);

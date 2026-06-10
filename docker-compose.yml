@@ -1,0 +1,83 @@
+services:
+  gateway:
+    build: ./gateway
+    ports: ["8080:8080"]
+    environment:
+      DOCMIND_API_URL: http://docmind-api:8000
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    depends_on: [docmind-api, redis]
+
+  docmind-api:
+    build: ./backend
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000
+    ports: ["8000:8000"]
+    env_file: .env
+    depends_on: [postgres, redis, qdrant, elasticsearch]
+
+  docmind-worker:
+    build: ./backend
+    command: python worker.py
+    env_file: .env
+    depends_on: [redis, docmind-api]
+
+  frontend:
+    build: ./frontend
+    ports: ["3000:3000"]
+    environment:
+      VITE_DOCMIND_API_URL: http://localhost:8000/api/v1
+    depends_on: [docmind-api]
+
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: docmind
+      POSTGRES_USER: docmind
+      POSTGRES_PASSWORD: docmind
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./infra/postgres:/docker-entrypoint-initdb.d:ro
+
+  redis:
+    image: redis:7-alpine
+    ports: ["6379:6379"]
+
+  qdrant:
+    image: qdrant/qdrant:v1.9.7
+    ports: ["6333:6333", "6334:6334"]
+    volumes: [qdrant_data:/qdrant/storage]
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: -Xms512m -Xmx512m
+    ports: ["9200:9200"]
+    volumes: [esdata:/usr/share/elasticsearch/data]
+
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    ports: ["9090:9090"]
+    volumes: ["./infra/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro"]
+
+  grafana:
+    image: grafana/grafana:11.1.0
+    ports: ["3001:3000"]
+    environment:
+      GF_SECURITY_ADMIN_USER: ${GRAFANA_ADMIN_USER:-admin}
+      GF_SECURITY_ADMIN_PASSWORD: ${GRAFANA_ADMIN_PASSWORD:-admin}
+    volumes: [grafana_data:/var/lib/grafana]
+
+  flower:
+    image: mher/flower:2.0
+    command: celery --broker=redis://redis:6379/0 flower --port=5555
+    ports: ["5555:5555"]
+    depends_on: [redis]
+
+volumes:
+  pgdata:
+  qdrant_data:
+  esdata:
+  grafana_data:

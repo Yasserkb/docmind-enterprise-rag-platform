@@ -1,0 +1,7 @@
+# Retail Banking Policy
+
+The maximum daily transaction limit for retail customers is EUR 50000.
+
+Late payment penalties apply after a 15 day grace period. The penalty rate is 1.5 percent per month on the outstanding amount.
+
+High risk customers require enhanced due diligence and compliance review before onboarding.

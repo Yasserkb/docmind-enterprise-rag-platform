@@ -1,0 +1,30 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: docmind-gateway
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+  cloud:
+    gateway:
+      default-filters:
+        - AddRequestHeader=X-Platform, DocMind
+        - name: RequestRateLimiter
+          args:
+            redis-rate-limiter.replenishRate: 20
+            redis-rate-limiter.burstCapacity: 40
+            key-resolver: "#{@principalOrIpKeyResolver}"
+      routes:
+        - id: docmind-api
+          uri: ${DOCMIND_API_URL:http://docmind-api:8000}
+          predicates:
+            - Path=/docmind/**
+          filters:
+            - StripPrefix=1
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,gateway

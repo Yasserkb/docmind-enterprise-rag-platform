@@ -9,4 +9,6 @@ class Repository(Protocol):
     documents: dict[UUID, Document]
     chunks: dict[UUID, Chunk]
 
-    def collection_chunks(self, collection_id: UUID) -> list[Chunk]: ...
+    def collection_chunks(
+        self, collection_id: UUID, workspace_id: str | None = None, user_id: str | None = None
+    ) -> list[Chunk]: ...

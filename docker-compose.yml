@@ -13,7 +13,16 @@ services:
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000
     ports: ["8000:8000"]
     env_file: .env
-    depends_on: [postgres, redis, qdrant, elasticsearch]
+    depends_on:
+      postgres: {condition: service_healthy}
+      redis: {condition: service_healthy}
+      qdrant: {condition: service_healthy}
+      elasticsearch: {condition: service_healthy}
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health/ready')"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
 
   docmind-worker:
     build: ./backend
@@ -40,15 +49,30 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql/data
       - ./infra/postgres:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U docmind -d docmind"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   redis:
     image: redis:7-alpine
     ports: ["6379:6379"]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
 
   qdrant:
     image: qdrant/qdrant:v1.9.7
     ports: ["6333:6333", "6334:6334"]
     volumes: [qdrant_data:/qdrant/storage]
+    healthcheck:
+      test: ["CMD-SHELL", "grep -q ':18BD ' /proc/net/tcp"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
 
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
@@ -58,6 +82,11 @@ services:
       ES_JAVA_OPTS: -Xms512m -Xmx512m
     ports: ["9200:9200"]
     volumes: [esdata:/usr/share/elasticsearch/data]
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:9200/_cluster/health?wait_for_status=yellow"]
+      interval: 15s
+      timeout: 5s
+      retries: 20
 
   prometheus:
     image: prom/prometheus:v2.52.0

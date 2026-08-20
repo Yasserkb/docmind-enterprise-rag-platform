@@ -26,5 +26,13 @@ class InMemoryStore:
             collection = self.collections[chunks[0].collection_id]
             collection.document_count = len([doc for doc in self.documents.values() if doc.collection_id == collection.id])
 
-    def collection_chunks(self, collection_id: UUID) -> list[Chunk]:
-        return [chunk for chunk in self.chunks.values() if chunk.collection_id == collection_id]
+    def collection_chunks(
+        self, collection_id: UUID, workspace_id: str | None = None, user_id: str | None = None
+    ) -> list[Chunk]:
+        return [
+            chunk
+            for chunk in self.chunks.values()
+            if chunk.collection_id == collection_id
+            and (workspace_id is None or chunk.workspace_id == workspace_id)
+            and (not chunk.allowed_user_ids or user_id in chunk.allowed_user_ids)
+        ]

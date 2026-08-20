@@ -25,6 +25,8 @@ The project demonstrates how a serious AI document system can be designed, struc
 
 This is not a simple chatbot wrapper. It is structured as a full software engineering project with a FastAPI AI core, React UI, Java/Spring gateway, Docker Compose infrastructure, tests, Prometheus metrics and clear production extension points.
 
+The repository documents its evidence boundary in [current state](docs/current-state.md), [gap analysis](docs/gap-analysis.md), and [known limitations](docs/known-limitations.md). The local API enforces workspace scope before collection access and retrieval; trusted identity headers are a demo boundary and must be replaced by verified JWT claims in production.
+
 ```text
 Document ingestion
 → text extraction
@@ -59,6 +61,7 @@ It combines:
 - reranking adapter prepared for a cross-encoder model;
 - grounded answer generation;
 - source citations;
+- workspace-aware authorization applied before retrieval;
 - RAG quality evaluation;
 - hallucination scoring;
 - LLMOps-style usage, cost and latency metrics.

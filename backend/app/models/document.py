@@ -11,6 +11,9 @@ class Document(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     title: str
     collection_id: UUID
+    workspace_id: str = "local-demo"
+    created_by: str = "local-demo-user"
+    allowed_user_ids: list[str] = Field(default_factory=list)
     source_type: SourceType
     source_uri: str | None = None
     content_hash: str

@@ -31,16 +31,19 @@ class IngestionPipeline:
         source_type: SourceType,
         content: bytes,
         metadata: dict | None = None,
+        created_by: str = "local-demo-user",
     ) -> Document:
         metadata = metadata or {}
         content_hash = hashlib.sha256(content).hexdigest()
-        existing = next((doc for doc in self.store.documents.values() if doc.content_hash == content_hash), None)
+        existing = next((doc for doc in self.store.documents.values() if doc.content_hash == content_hash and doc.collection_id == collection.id), None)
         if existing:
             return existing
 
         document = Document(
             title=filename,
             collection_id=collection.id,
+            workspace_id=collection.workspace_id,
+            created_by=created_by,
             source_type=source_type,
             source_uri=filename,
             content_hash=content_hash,
@@ -67,6 +70,7 @@ class IngestionPipeline:
                 Chunk(
                     document_id=document.id,
                     collection_id=collection.id,
+                    workspace_id=collection.workspace_id,
                     content=piece.content,
                     chunk_index=index,
                     token_count=piece.token_count,

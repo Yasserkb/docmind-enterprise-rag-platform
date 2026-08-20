@@ -11,6 +11,11 @@ class Settings:
     redis_url: str = os.getenv("REDIS_URL", "redis://localhost:6379/0")
     qdrant_url: str = os.getenv("QDRANT_URL", "http://localhost:6333")
     elasticsearch_url: str = os.getenv("ELASTICSEARCH_URL", "http://localhost:9200")
+    cors_origins: tuple[str, ...] = tuple(
+        origin.strip()
+        for origin in os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:8080").split(",")
+        if origin.strip()
+    )
 
 
 settings = Settings()

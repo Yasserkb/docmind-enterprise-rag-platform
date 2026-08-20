@@ -8,6 +8,8 @@ class Chunk(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     document_id: UUID
     collection_id: UUID
+    workspace_id: str = "local-demo"
+    allowed_user_ids: list[str] = Field(default_factory=list)
     content: str
     chunk_index: int
     token_count: int

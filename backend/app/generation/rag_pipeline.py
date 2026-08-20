@@ -15,9 +15,9 @@ class RagPipeline:
         self.store = store
         self.search = HybridSearchEngine()
 
-    def run(self, req: QueryRequest) -> QueryResponse:
+    def run(self, req: QueryRequest, workspace_id: str | None = None, user_id: str | None = None) -> QueryResponse:
         start = time.perf_counter()
-        chunks = self.store.collection_chunks(req.collection_id)
+        chunks = self.store.collection_chunks(req.collection_id, workspace_id, user_id)
         retrieved = self.search.search(
             req.question,
             req.collection_id,

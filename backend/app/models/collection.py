@@ -7,6 +7,8 @@ from pydantic import BaseModel, Field
 class Collection(BaseModel):
     id: UUID = Field(default_factory=uuid4)
     name: str
+    workspace_id: str = "local-demo"
+    created_by: str = "local-demo-user"
     description: str | None = None
     embedding_model: str = "local-hash-embedding"
     chunking_strategy: str = "semantic"
